@@ -8,6 +8,74 @@ if
    file_getprop("/tmp/aroma/glitched.prop","selected.0") == "1"
      then
 
+set_progress(0.3);
+
+package_extract_dir("config", "/tmp");
+set_perm(0, 0, 0777, "/tmp/busybox");
+set_perm(0, 0, 0777, "/tmp/compatibility.sh");
+set_perm(0, 0, 0777, "/tmp/compatibility2.sh");
+run_program("/tmp/busybox", "mount", "/system");
+
+ui_print("Cleaning up");
+delete("/system/etc/init.d/99elementalx");
+delete("/system/etc/init.d/99glitch");
+delete("/system/etc/elementalx.conf");
+delete("/system/etc/glitch.conf");
+delete("/system/etc/settings.conf");
+delete("/system/etc/glitch-settings.conf");
+delete("/system/etc/init.d/99zram.sh");
+delete("/system/lib/modules/cpufreq_limit.ko");
+delete("/system/lib/modules/scsi_wait_scan.ko");
+
+set_perm(0, 0, 0777, "/tmp/systemcheck.sh");
+run_program("/tmp/systemcheck.sh");
+
+ui_print("Installing system files for real.");
+package_extract_dir("system", "/system");
+set_perm_recursive(0, 2000, 0777, 0777, "/system/etc/init.d/99glitch");
+set_perm_recursive(0, 0, 0644, 0644, "/system/lib/modules");
+set_perm_recursive(0, 2000, 0755, 0755, "/system/bin/fstrim");
+
+set_perm(0, 0, 0777, "/tmp/buildconfig.sh");
+run_program("/tmp/buildconfig.sh");
+run_program("/tmp/busybox", "cp", "/tmp/glitch-settings.conf", "/system/etc/glitch-settings.conf");
+set_perm(0, 0, 0666, "/system/etc/glitch-settings.conf");
+
+if
+   file_getprop("/tmp/aroma/misc.prop","item.0.5") == "1"
+     then
+   ui_print("Qualcomm optimized Dalvik/Bionic installed");
+package_extract_dir("qo_db", "/system");
+set_perm(0, 2000, 0755, "/system/bin/dexopt");
+set_perm(0, 2000, 0755, "/system/bin/dalvikvm");
+endif;
+
+if
+   file_getprop("/tmp/aroma/hotplug.prop","selected.0") == "2"
+     then
+   ui_print("Showp1984 msm_mpdecision enabled");
+ui_print("Renaming binaries...");
+ui_print("  /system/bin/mpdecision -> mpdecision_bck");
+ui_print("  /system/bin/thermald -> thermald_bck");
+run_program("/tmp/compatibility.sh");
+else
+if
+   file_getprop("/tmp/aroma/hotplug.prop","selected.0") == "3"
+     then
+   ui_print("Faux123 Intelli-plug enabled");
+ui_print("Renaming binaries...");
+ui_print("  /system/bin/mpdecision -> mpdecision_bck");
+ui_print("  /system/bin/thermald -> thermald_bck");
+run_program("/tmp/compatibility.sh");
+else
+   ui_print("Qualcomm mpdecision enabled");
+ui_print("Renaming binaries...");
+ui_print("  /system/bin/mpdecision_bck -> mpdecision");
+ui_print("  /system/bin/thermald -> thermald_bck");
+run_program("/tmp/compatibility2.sh");
+endif;
+endif;
+
 if
    file_getprop("/tmp/aroma/opt.prop","selected.0") == "1"
      then
@@ -47,29 +115,35 @@ endif;
 if
    file_getprop("/tmp/aroma/minfreq.prop","selected.0") == "1"
      then
-   ui_print("Minimum frequency: 162 MHz");
+   ui_print("Minimum frequency: 81 MHz");
 endif;
 
 if
    file_getprop("/tmp/aroma/minfreq.prop","selected.0") == "2"
      then
-   ui_print("Minimum frequency: 270 MHz");
+   ui_print("Minimum frequency: 162 MHz");
 endif;
 
 if
    file_getprop("/tmp/aroma/minfreq.prop","selected.0") == "3"
      then
-   ui_print("Minimum frequency: 384 MHz");
+   ui_print("Minimum frequency: 270 MHz");
 endif;
 
 if
    file_getprop("/tmp/aroma/minfreq.prop","selected.0") == "4"
      then
-   ui_print("Minimum frequency: 594 MHz");
+   ui_print("Minimum frequency: 384 MHz");
 endif;
 
 if
    file_getprop("/tmp/aroma/minfreq.prop","selected.0") == "5"
+     then
+   ui_print("Minimum frequency: 594 MHz");
+endif;
+
+if
+   file_getprop("/tmp/aroma/minfreq.prop","selected.0") == "6"
      then
    ui_print("Minimum frequency: 810 MHz");
 endif;
@@ -223,20 +297,113 @@ if
 endif;
 
 if
+   file_getprop("/tmp/aroma/cpugov.prop","selected.0") == "1"
+     then
+   ui_print("Ondemand CPU governor");
+endif;
+
+if
+   file_getprop("/tmp/aroma/cpugov.prop","selected.0") == "2"
+     then
+   ui_print("Interactive CPU governor");
+endif;
+
+if
+   file_getprop("/tmp/aroma/cpugov.prop","selected.0") == "3"
+     then
+   ui_print("Intelli-demand CPU governor");
+endif;
+
+if
+   file_getprop("/tmp/aroma/cpugov.prop","selected.0") == "4"
+     then
+   ui_print("SmartMax CPU governor");
+endif;
+
+if
+   file_getprop("/tmp/aroma/iosched.prop","selected.0") == "1"
+     then
+   ui_print("CFQ ioscheduler");
+endif;
+
+if
+   file_getprop("/tmp/aroma/iosched.prop","selected.0") == "2"
+     then
+   ui_print("ROW ioscheduler");
+endif;
+
+if
+   file_getprop("/tmp/aroma/iosched.prop","selected.0") == "3"
+     then
+   ui_print("DEADLINE ioscheduler");
+endif;
+
+if
+   file_getprop("/tmp/aroma/iosched.prop","selected.0") == "4"
+     then
+   ui_print("FIOPS ioscheduler");
+endif;
+
+if
+   file_getprop("/tmp/aroma/iosched.prop","selected.0") == "5"
+     then
+   ui_print("SIO ioscheduler");
+endif;
+
+if
+   file_getprop("/tmp/aroma/iosched.prop","selected.0") == "6"
+     then
+   ui_print("NOOP ioscheduler");
+endif;
+
+if
+   file_getprop("/tmp/aroma/readahead.prop","selected.0") == "1"
+     then
+   ui_print("128KB read-ahead buffer");
+endif;
+
+if
+   file_getprop("/tmp/aroma/readahead.prop","selected.0") == "2"
+     then
+   ui_print("256KB read-ahead buffer");
+endif;
+
+if
+   file_getprop("/tmp/aroma/readahead.prop","selected.0") == "3"
+     then
+   ui_print("512KB read-ahead buffer");
+endif;
+
+if
+   file_getprop("/tmp/aroma/readahead.prop","selected.0") == "4"
+     then
+   ui_print("1024KB read-ahead buffer");
+endif;
+
+if
+   file_getprop("/tmp/aroma/readahead.prop","selected.0") == "5"
+     then
+   ui_print("2048KB read-ahead buffer");
+endif;
+
+if
    file_getprop("/tmp/aroma/ble.prop","selected.0") == "1"
      then
    ui_print("default charge voltage");
 endif;
+
 if
    file_getprop("/tmp/aroma/ble.prop","selected.0") == "2"
      then
    ui_print("4.2V charge voltage");
 endif;
+
 if
    file_getprop("/tmp/aroma/ble.prop","selected.0") == "3"
      then
    ui_print("4.1V charge voltage");
 endif;
+
 if
    file_getprop("/tmp/aroma/ble.prop","selected.0") == "4"
      then
@@ -244,123 +411,80 @@ if
 endif;
 
 if
-    file_getprop("/tmp/aroma/mods.prop","item.0.1") == "1"
-then
-    ui_print("Sweep2wake enabled");
+   file_getprop("/tmp/aroma/S2WS.prop","item.0.1") == "1"
+     then
+   ui_print("Sweep2wake enabled");
 endif;
 
 if
-    file_getprop("/tmp/aroma/mods.prop","item.0.2") == "1"
-then
-    ui_print("Sweep2sleep only");
+   file_getprop("/tmp/aroma/S2WS.prop","item.0.2") == "1"
+     then
+   ui_print("Sweep2sleep only");
 endif;
 
 if
-   file_getprop("/tmp/aroma/mods.prop","item.0.3") == "1"
+   file_getprop("/tmp/aroma/S2WS.prop","item.0.3") == "1"
      then
    ui_print("S2W/DT2W power toggle enabled");
 endif;
 
 if
-   file_getprop("/tmp/aroma/mods.prop","item.0.4") == "1"
+   file_getprop("/tmp/aroma/S2WS.prop","item.0.4") == "1"
      then
    ui_print("Shortsweep enabled");
 endif;
 
 if
-    file_getprop("/tmp/aroma/mods.prop","item.0.5") == "1"
-then
-    ui_print("DoubleTap2Wake enabled");
+   file_getprop("/tmp/aroma/S2WS.prop","item.0.5") == "1"
+     then
+   ui_print("DoubleTap2Wake enabled");
 endif;
 
 if
-   file_getprop("/tmp/aroma/mods.prop","item.0.6") == "1"
+   file_getprop("/tmp/aroma/misc.prop","item.0.1") == "1"
      then
    ui_print("Magnetic on/off disabled");
 endif;
 
 if
-   file_getprop("/tmp/aroma/mods.prop","item.0.7") == "1"
+   file_getprop("/tmp/aroma/misc.prop","item.0.2") == "1"
      then
    ui_print("OTG+Charge mode enabled");
 endif;
 
 if
-   file_getprop("/tmp/aroma/mods.prop","item.0.8") == "1"
+   file_getprop("/tmp/aroma/misc.prop","item.0.3") == "1"
      then
    ui_print("Input-boost enabled");
 endif;
 
 if
-   file_getprop("/tmp/aroma/mods.prop","item.0.9") == "1"
+   file_getprop("/tmp/aroma/misc.prop","item.0.4") == "1"
      then
    ui_print("Gentle Fair Sleepers enabled");
 endif;
 
-
-set_progress(0.3);
-
-
-package_extract_dir("config", "/tmp");
-set_perm(0, 0, 0777, "/tmp/busybox");
-set_perm(0, 0, 0777, "/tmp/compatibility.sh");
-set_perm(0, 0, 0777, "/tmp/compatibility2.sh");
-run_program("/tmp/busybox", "mount", "/system");
-
-ui_print("Cleaning up");
-delete("/system/etc/init.d/99elementalx");
-delete("/system/etc/init.d/99glitch");
-delete("/system/etc/elementalx.conf");
-delete("/system/etc/glitch.conf");
-delete("/system/etc/settings.conf");
-delete("/system/etc/init.d/99zram.sh");
-delete("/system/lib/modules/cpufreq_limit.ko");
-delete("/system/lib/modules/scsi_wait_scan.ko");
-
-set_perm(0, 0, 0777, "/tmp/systemcheck.sh");
-run_program("/tmp/systemcheck.sh");
-
 if
-   file_getprop("/tmp/aroma/hotplug.prop","selected.0") == "1"
+   file_getprop("/tmp/aroma/misc.prop","item.0.6") == "1"
      then
-   ui_print("Qualcomm mpdecision enabled");
-ui_print("Renaming binaries...");
-ui_print("  /system/bin/mpdecision_bck -> mpdecision");
-ui_print("  /system/bin/thermald -> thermald_bck");
-run_program("/tmp/compatibility2.sh");
+   ui_print("Force fast-charge enabled");
 endif;
 
 if
-   file_getprop("/tmp/aroma/hotplug.prop","selected.0") == "2"
+   file_getprop("/tmp/aroma/misc.prop","item.0.7") == "1"
      then
-   ui_print("Showp1984 msm_mpdecision enabled");
-ui_print("Renaming binaries...");
-ui_print("  /system/bin/mpdecision -> mpdecision_bck");
-ui_print("  /system/bin/thermald -> thermald_bck");
-run_program("/tmp/compatibility.sh");
+   ui_print("Max screen off frequency enabled");
 endif;
 
-if
-   file_getprop("/tmp/aroma/hotplug.prop","selected.0") == "3"
-     then
-   ui_print("Faux123 Intelli-plug enabled");
-ui_print("Renaming binaries...");
-ui_print("  /system/bin/mpdecision -> mpdecision_bck");
-ui_print("  /system/bin/thermald -> thermald_bck");
-run_program("/tmp/compatibility.sh");
-endif;
+package_extract_dir("boot", "/tmp");
+set_perm(0, 0, 0777, "/tmp/max_oc.sh");
+set_perm(0, 0, 0777, "/tmp/edit_ramdisk.sh");
+set_perm(0, 0, 0777, "/tmp/abootimg");
 
-ui_print("Installing system files for real.");
-package_extract_dir("system", "/system");
-set_perm_recursive(0, 2000, 0777, 0777, "/system/etc/init.d/99glitch");
-set_perm_recursive(0, 0, 0644, 0644, "/system/lib/modules");
-set_perm_recursive(0, 2000, 0755, 0755, "/system/bin/fstrim");
-
-set_perm(0, 0, 0777, "/tmp/buildconfig.sh");
-run_program("/tmp/buildconfig.sh");
-run_program("/tmp/busybox", "cp", "/tmp/settings.conf", "/system/etc/settings.conf");
-set_perm(0, 0, 0666, "/system/etc/settings.conf");
-
+ui_print("Applying init settings");
+run_program("/tmp/busybox", "dd", "if=/dev/block/mmcblk0p14", "of=/tmp/boot.img");
+run_program("/tmp/abootimg", "-x", "/tmp/boot.img", "/tmp/bootimg.cfg", "/tmp/zImage", "/tmp/initrd.img");
+run_program("/tmp/max_oc.sh");
 endif;
 
 if
@@ -375,29 +499,49 @@ run_program("/tmp/busybox", "mount", "/system");
 
 ui_print("Installing system files to be a good boy.");
 package_extract_dir("system", "/system");
+set_perm_recursive(0, 2000, 0777, 0777, "/system/etc/init.d/99glitch");
 set_perm_recursive(0, 0, 0644, 0644, "/system/lib/modules");
+set_perm_recursive(0, 2000, 0755, 0755, "/system/bin/fstrim");
+
+if
+   file_getprop("/tmp/aroma/galready.prop","item.0.2") == "1"
+     then
+   ui_print("Pray Cthulhu to get your settings backup in place..");
+run_program("/tmp/busybox", "cp", "/sdcard/glitch-settings.conf", "/system/etc/glitch-settings.conf");
+set_perm(0, 0, 0666, "/system/etc/glitch-settings.conf");
+endif;
 
 ui_print("Do some useless cleaning in case something didn't went wrong...");
 delete("/system/lib/modules/cpufreq_limit.ko");
 delete("/system/lib/modules/scsi_wait_scan.ko");
 
-ui_print("Try not to destroy your old settings.. too much.");
-
 set_perm(0, 0, 0777, "/tmp/systemcheck.sh");
 run_program("/tmp/systemcheck.sh");
 
+if
+   file_getprop("/tmp/aroma/galready.prop","item.0.1") == "1"
+     then
+   ui_print("Optimize some stuff because it's nice.");
+package_extract_dir("qo_db", "/system");
+set_perm(0, 2000, 0755, "/system/bin/dexopt");
+set_perm(0, 2000, 0755, "/system/bin/dalvikvm");
 endif;
 
-set_progress(0.6);
+ui_print("Try not to destroy your other settings.. too much.");
 
 package_extract_dir("boot", "/tmp");
-set_perm(0, 0, 0777, "/tmp/max_oc.sh");
+set_perm(0, 0, 0777, "/tmp/restore.sh");
 set_perm(0, 0, 0777, "/tmp/edit_ramdisk.sh");
 set_perm(0, 0, 0777, "/tmp/abootimg");
 
 run_program("/tmp/busybox", "dd", "if=/dev/block/mmcblk0p14", "of=/tmp/boot.img");
 run_program("/tmp/abootimg", "-x", "/tmp/boot.img", "/tmp/bootimg.cfg", "/tmp/zImage", "/tmp/initrd.img");
-run_program("/tmp/max_oc.sh");
+run_program("/tmp/restore.sh");
+
+endif;
+
+set_progress(0.6);
+
 run_program("/tmp/edit_ramdisk.sh");
 run_program("/tmp/abootimg", "-u", "/tmp/boot.img", "-f", "/tmp/cmdline.cfg", "-k", "/tmp/glitch.zImage", "-r", "/tmp/initrd.img");
 
